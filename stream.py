@@ -45,9 +45,13 @@ def weight(endpoint, cache, video):
 
 	return num_requests * delta_latency / video_size
 
-sample_cache = CacheServer(1, 1000)
-sample_endpoint = Endpoint(1, {1: 100}, {1: 50}, 500)
-sample_video = Video(1, 500)
 
-print(weight(sample_endpoint, sample_cache, sample_video))
+def test_weight():
+	sample_cache = CacheServer(1, 1000)
+	sample_endpoint = Endpoint(1, {1: 100}, {1: 50}, 500)
+	sample_video = Video(1, 500)
+
+	print(weight(sample_endpoint, sample_cache, sample_video))
+
+test_weight()
 
