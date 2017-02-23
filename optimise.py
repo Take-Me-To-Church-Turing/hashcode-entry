@@ -34,7 +34,7 @@ def runWithParseTest():
     caches, endpoints = parse("kittens.in")
     run(caches, endpoints)
 
-    output_file = "output.out"
+    output_file = "kittens.out"
 
     write_output(caches, output_file)
 
