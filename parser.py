@@ -16,6 +16,10 @@ def parse(fileName):
 	for i in range(numberOfCacheServers):
 		cacheList.append(Cache(i, cacheServerSize))
 
+	videoList = []
+	for i in range(numberOfVideos):
+		videoList.append(Video(i, videosSizes[i]))
+
 	endpoints = []
 	startIndex = 2
 	for i in range(numberOfEndpoints):
@@ -25,7 +29,7 @@ def parse(fileName):
 	for _ in range(numberOfVideoRequests):
 		curLine = lines[startIndex]
 		startIndex += 1
-		endpoints[curLine[1]][2][Video(curLine[0], curLine[2])] = curLine[2] 
+		endpoints[curLine[1]][2][videoList[curLine[0]]] = curLine[2] 
 
 	endpointList = []
 
