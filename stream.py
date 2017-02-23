@@ -3,7 +3,7 @@ class CacheServer:
 	capacity = 0 # MB
 	used = 0 # MB
 
-	videos = []
+	cached_videos = []
 
 	def __init__(self, uid, capacity):
 		self.uid = uid
@@ -11,9 +11,9 @@ class CacheServer:
 
 class Endpoint:
 	uid = 0
-	cache_latencies = {} # cache uid, latency.  You probably want delta_latencies
-	delta_latencies = {} # cache uid, delta latency
-	video_requests = {} # video uid, num_requests
+	cache_latencies = {} # cache, latency.  You probably want delta_latencies
+	delta_latencies = {} # cache, delta latency
+	video_requests = {} # video, num_requests
 	datacenter_latency = 0
 
 	def __init__(self, uid, cache_latencies, video_requests, datacenter_latency):
@@ -25,8 +25,16 @@ class Endpoint:
 		self.compute_delta_latencies()
 
 	def compute_delta_latencies(self):
-		for uid, cache_latency in self.cache_latencies.items():
-			self.delta_latencies[uid] = self.datacenter_latency - cache_latency
+		for cache, cache_latency in self.cache_latencies.items():
+			self.delta_latencies[cache] = self.datacenter_latency - cache_latency
+
+	def make_unsorted_queue(self, cache):
+		unsorted = {}
+
+		for video, num_requests in self.video_requests.items():
+			unsorted[video] = weight(self, cache, video)
+
+		return unsorted
 
 class Video:
 	uid = 0
@@ -39,19 +47,21 @@ class Video:
 def weight(endpoint, cache, video):
 	# num_requests * (datacenter latency - cache latency) / video_size
 
-	num_requests = endpoint.video_requests[video.uid]
-	delta_latency = endpoint.delta_latencies[cache.uid]
+	num_requests = endpoint.video_requests[video]
+	delta_latency = endpoint.delta_latencies[cache]
 	video_size = video.size
 
 	return num_requests * delta_latency / video_size
 
 
-def test_weight():
-	sample_cache = CacheServer(1, 1000)
-	sample_endpoint = Endpoint(1, {1: 100}, {1: 50}, 500)
-	sample_video = Video(1, 500)
+def test():
+	caches = [CacheServer(0, 1000)]
+	videos = [Video(0, 500)]
+	endpoints = [Endpoint(0, {caches[0]: 100}, {videos[0]: 50}, 500)]
 
-	print(weight(sample_endpoint, sample_cache, sample_video))
+	print(weight(endpoints[0], caches[0], videos[0]))
 
-test_weight()
+	print(endpoints[0].make_unsorted_queue(caches[0]))
+
+test()
 
