@@ -4,7 +4,7 @@ class Cache:
     used = 0 # MB
 
     cached_videos = []
-    cached_video_priority_queue = []
+    cached_video_priority_queue = [] # (video * (benefit * endpoints)) list
     cached_video_benefit_dict = {} # video:(benefit * endpoints)
 
     def __init__(self, uid, capacity):
@@ -13,7 +13,10 @@ class Cache:
 
     def populate_priority_queue(self):
         self.cached_video_priority_queue = []
-        print(self.cached_video_benefit_dict.items())
+        cached_video_benefit_items = list(self.cached_video_benefit_dict.items())
+        cached_video_benefit_items.sort(key=lambda i: i[1][0], reverse=True)
+        print(cached_video_benefit_items)
+        self.cached_video_priority_queue = cached_video_benefit_items
 
     def fill_cache(self, sorted_queue):
         # todo refactor
@@ -77,8 +80,8 @@ class Video:
 
 def test():
     caches = [Cache(0, 1000)]
-    videos = [Video(0, 500)]
-    endpoints = [Endpoint(0, {caches[0]: 100}, {videos[0]: 50}, 500)]
+    videos = [Video(0, 500), Video(1, 200)]
+    endpoints = [Endpoint(0, {caches[0]: 100}, {videos[0]: 50, videos[1]: 100}, 500)]
 
     # Combine endpoints
     for endpoint in endpoints:
