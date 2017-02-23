@@ -5,6 +5,7 @@ from emitter import *
 def run(caches, endpoints):
     # Combine endpoints
     for endpoint in endpoints:
+        print("Endpoint", endpoint.uid)
         unsorted_cache_video_benefits = endpoint.compute_unsorted_cache_video_benefits()
         for cache, video_benefits in unsorted_cache_video_benefits.items():
             for video, benefit in video_benefits.items():
@@ -17,6 +18,7 @@ def run(caches, endpoints):
                     
     # Now convert caches[i].cached_video_benefit_dict to ordered list
     for cache in caches:
+        print("Converting cache", cache.uid)
         cache.populate_priority_queue()
         cache.fill_cache()
 
@@ -29,10 +31,12 @@ def test():
     run(caches, endpoints)
 
 def runWithParseTest():
-    caches, endpoints = parse("test.in")
+    caches, endpoints = parse("kittens.in")
     run(caches, endpoints)
 
-    print(get_output_string(caches))
+    output_file = "output.out"
+
+    write_output(caches, output_file)
 
 if __name__ == '__main__':
 	runWithParseTest()

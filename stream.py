@@ -54,7 +54,7 @@ class Endpoint:
         delta_latency = self.delta_latencies[cache]
         video_size = video.size
 
-        return num_requests * delta_latency / video_size
+        return num_requests * delta_latency / (video_size * len(self.caches))
 
 class Video:
     def __init__(self, uid, size):
