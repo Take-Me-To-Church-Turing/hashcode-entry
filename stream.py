@@ -1,67 +1,108 @@
-class CacheServer:
-	uid = 0
-	capacity = 0 # MB
-	used = 0 # MB
+class Cache:
+    uid = 0
+    capacity = 0 # MB
+    used = 0 # MB
 
-	cached_videos = []
+    cached_videos = []
+    cached_video_priority_queue = []
+    cached_video_benefit_dict = {} # video:(benefit * endpoints)
 
-	def __init__(self, uid, capacity):
-		self.uid = uid
-		self.capacity = capacity
+    def __init__(self, uid, capacity):
+        self.uid = uid
+        self.capacity = capacity
+
+    def populate_priority_queue(self):
+        self.cached_video_priority_queue = []
+        print(self.cached_video_benefit_dict.items())
+
+    def fill_cache(self, sorted_queue):
+        # todo refactor
+        # sorted_queue has type (video * benefit) list
+
+        for (video, benefit) in sorted_queue:
+            if (self.used + video.size > capacity):
+                continue
+            cached_videos.append(video)
+        
 
 class Endpoint:
-	uid = 0
-	cache_latencies = {} # cache, latency.  You probably want delta_latencies
-	delta_latencies = {} # cache, delta latency
-	video_requests = {} # video, num_requests
-	datacenter_latency = 0
+    uid = 0
+    delta_latencies = {} # cache, delta latency
+    video_requests = {} # video, num_requests
+    caches = []
+    datacenter_latency = 0
 
-	def __init__(self, uid, cache_latencies, video_requests, datacenter_latency):
-		self.uid = uid
-		self.cache_latencies = cache_latencies
-		self.video_requests = video_requests
-		self.datacenter_latency = datacenter_latency
+    unsorted_cache_video_benefits = {} # (cache-(video-benefit dictionary) dictionary)
 
-		self.compute_delta_latencies()
+    def __init__(self, uid, cache_latencies, video_requests, datacenter_latency):
+        self.uid = uid
+        self.caches = cache_latencies.keys()
+        self.video_requests = video_requests
+        self.datacenter_latency = datacenter_latency
 
-	def compute_delta_latencies(self):
-		for cache, cache_latency in self.cache_latencies.items():
-			self.delta_latencies[cache] = self.datacenter_latency - cache_latency
+        self.compute_delta_latencies(cache_latencies)
 
-	def make_unsorted_queue(self, cache):
-		unsorted = {}
+    def compute_delta_latencies(self, cache_latencies):
+        for cache, cache_latency in cache_latencies.items():
+            self.delta_latencies[cache] = self.datacenter_latency - cache_latency
 
-		for video, num_requests in self.video_requests.items():
-			unsorted[video] = weight(self, cache, video)
+    def compute_unsorted_cache_video_benefits(self):
+        caches = self.delta_latencies.keys()
+        for cache in caches:
+            video_benefits = {}
 
-		return unsorted
+            for video, num_requests in self.video_requests.items():
+                video_benefits[video] = self.video_weight_per_cache(cache, video)
+            
+            self.unsorted_cache_video_benefits[cache] = video_benefits
+        
+        return self.unsorted_cache_video_benefits
+
+    def video_weight_per_cache(self, cache, video):
+        # num_requests * (datacenter latency - cache latency) / video_size
+
+        num_requests = self.video_requests[video]
+        delta_latency = self.delta_latencies[cache]
+        video_size = video.size
+
+        return num_requests * delta_latency / video_size
 
 class Video:
-	uid = 0
-	size = 0
+    uid = 0
+    size = 0
 
-	def __init__(self, uid, size):
-		self.uid = uid
-		self.size = size
-
-def weight(endpoint, cache, video):
-	# num_requests * (datacenter latency - cache latency) / video_size
-
-	num_requests = endpoint.video_requests[video]
-	delta_latency = endpoint.delta_latencies[cache]
-	video_size = video.size
-
-	return num_requests * delta_latency / video_size
-
+    def __init__(self, uid, size):
+        self.uid = uid
+        self.size = size
 
 def test():
-	caches = [CacheServer(0, 1000)]
-	videos = [Video(0, 500)]
-	endpoints = [Endpoint(0, {caches[0]: 100}, {videos[0]: 50}, 500)]
+    caches = [Cache(0, 1000)]
+    videos = [Video(0, 500)]
+    endpoints = [Endpoint(0, {caches[0]: 100}, {videos[0]: 50}, 500)]
 
-	print(weight(endpoints[0], caches[0], videos[0]))
+    # Combine endpoints
+    for endpoint in endpoints:
+        unsorted_cache_video_benefits = endpoint.compute_unsorted_cache_video_benefits()
+        for cache, video_benefits in unsorted_cache_video_benefits.items():
+            for video, benefit in video_benefits.items():
+                if video in cache.cached_video_benefit_dict:
+                    current_benefit = cache.cached_video_benefit_dict[video]
+                    current_benefit[0] += benefit
+                    current_benefit[1].append(endpoint)
+                else:
+                    cache.cached_video_benefit_dict[video] = (benefit, [endpoint])
 
-	print(endpoints[0].make_unsorted_queue(caches[0]))
+    print(caches[0].cached_video_benefit_dict)
+
+    # Now convert caches[i].cached_video_benefit_dict to ordered list
+
+    for cache in caches:
+        cache.populate_priority_queue()
+
+    # for cache, video_benefits in cache_benefits.items():
+    #     video_benefits.sort(key=lambda video_benefit: video_benefit[0])
+
+    
 
 test()
 
