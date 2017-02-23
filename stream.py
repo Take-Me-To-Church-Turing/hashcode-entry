@@ -5,7 +5,7 @@ class Cache:
 
     cached_videos = []
     cached_video_priority_queue = [] # (video * (benefit * endpoints)) list
-    cached_video_benefit_dict = {} # video:(benefit * endpoints)
+    cached_video_benefit_dict = {} # video:[benefit, endpoints]
 
     def __init__(self, uid, capacity):
         self.uid = uid
@@ -78,6 +78,9 @@ class Video:
         self.uid = uid
         self.size = size
 
+    def __repr__(self):
+        return "Video({}, {})".format(self.uid, self.size)
+
 def test():
     caches = [Cache(0, 100), Cache(1, 100), Cache(2, 100)]
     videos = [Video(0, 50), Video(1, 50), Video(2, 80), Video(3, 30), Video(4, 110)]
@@ -92,10 +95,11 @@ def test():
                 if video in cache.cached_video_benefit_dict:
                     current_benefit = cache.cached_video_benefit_dict[video]
                     print(benefit)
+                    print(current_benefit)
                     current_benefit[0] += benefit
                     current_benefit[1].append(endpoint)
                 else:
-                    cache.cached_video_benefit_dict[video] = (benefit, [endpoint])
+                    cache.cached_video_benefit_dict[video] = [benefit, [endpoint]]
 
     print(caches[0].cached_video_benefit_dict)
 
@@ -104,6 +108,8 @@ def test():
     for cache in caches:
         cache.populate_priority_queue()
         cache.fill_cache()
+
+
 
 if __name__ == '__main__':
 	test()

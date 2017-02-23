@@ -21,6 +21,6 @@ def write_output(cache_servers, filepath):
 
 # Testing
 if __name__ == '__main__':
-    server = CacheServer(3290, 100)
+    server = Cache(3290, 100)
     server.videos = [Video(2, 100), Video(4, 200)]
     print(get_output_string([server]))
