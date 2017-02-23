@@ -53,5 +53,5 @@ def test_weight():
 
 	print(weight(sample_endpoint, sample_cache, sample_video))
 
-test_weight()
-
+if __name__ == '__main__':
+	test_weight()
