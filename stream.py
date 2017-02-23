@@ -100,9 +100,6 @@ def test():
                     current_benefit[1].append(endpoint)
                 else:
                     cache.cached_video_benefit_dict[video] = [benefit, [endpoint]]
-
-    print(caches[0].cached_video_benefit_dict)
-
     # Now convert caches[i].cached_video_benefit_dict to ordered list
 
     for cache in caches:
