@@ -14,6 +14,11 @@ def get_output_string(cache_servers):
     
     return output
 
+def write_output(cache_servers, filepath):
+    text_file = open(filepath, "w")
+    text_file.write(get_output_string(cache_servers))
+    text_file.close()
+
 # Testing
 if __name__ == '__main__':
     server = CacheServer(3290, 100)
