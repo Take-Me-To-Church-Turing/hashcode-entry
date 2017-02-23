@@ -5,9 +5,9 @@ class CacheServer:
 
 	videos = []
 
-	def __init__(uid, size):
-		this.uid = uid
-		this.capacity = capacity
+	def __init__(self, uid, capacity):
+		self.uid = uid
+		self.capacity = capacity
 
 class Endpoint:
 	uid = 0
@@ -15,17 +15,17 @@ class Endpoint:
 	video_requests = {} # uid, num_requests
 	datacenter_latency = 0
 
-	def __init__(uid, cache_latencies):
-		this.uid = uid
-		this.cache_latencies = cache_latencies
+	def __init__(self, uid, cache_latencies):
+		self.uid = uid
+		self.cache_latencies = cache_latencies
 
 class Video:
 	uid = 0
 	size = 0
 
-	def __init__(uid, size):
-		this.uid = uid
-		this.size = size
+	def __init__(self, uid, size):
+		self.uid = uid
+		self.size = size
 
 def weight(endpoint, cache, video):
 	pass
