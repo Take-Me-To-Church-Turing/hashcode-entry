@@ -14,18 +14,18 @@ class Cache:
     def populate_priority_queue(self):
         self.cached_video_priority_queue = []
         cached_video_benefit_items = list(self.cached_video_benefit_dict.items())
-        cached_video_benefit_items.sort(key=lambda i: i[1][0], reverse=True)
-        print(cached_video_benefit_items)
-        self.cached_video_priority_queue = cached_video_benefit_items
+        self.cached_video_priority_queue = sorted(cached_video_benefit_items, key=lambda i: i[1][0], reverse=True)
 
-    def fill_cache(self, sorted_queue):
+    def fill_cache(self):
         # todo refactor
         # sorted_queue has type (video * benefit) list
 
-        for (video, benefit) in sorted_queue:
-            if (self.used + video.size > capacity):
+        for (video, (benefit, endpoints)) in self.cached_video_priority_queue:
+            if (self.used + video.size > self.capacity):
                 continue
-            cached_videos.append(video)
+            self.cached_videos.append(video)
+        
+        print(self.cached_videos)
         
 
 class Endpoint:
@@ -101,10 +101,7 @@ def test():
 
     for cache in caches:
         cache.populate_priority_queue()
-
-    # for cache, video_benefits in cache_benefits.items():
-    #     video_benefits.sort(key=lambda video_benefit: video_benefit[0])
-
+        cache.fill_cache()
 
 if __name__ == '__main__':
 	test()
