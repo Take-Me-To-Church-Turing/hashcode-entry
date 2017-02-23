@@ -13,8 +13,8 @@ class Cache:
 
     def populate_priority_queue(self):
         self.cached_video_priority_queue = []
-        cached_video_benefit_items = list(self.cached_video_benefit_dict.items())
-        self.cached_video_priority_queue = sorted(cached_video_benefit_items, key=lambda i: i[1][0], reverse=True)
+        self.cached_video_priority_queue = list(self.cached_video_benefit_dict.items())
+        self.cached_video_priority_queue.sort(key=lambda i: i[1][0], reverse=True)
 
     def fill_cache(self):
         # todo refactor
