@@ -7,7 +7,7 @@ def get_output_string(cache_servers):
     for server in cache_servers:
         output += str(server.uid) + " "
 
-        for video in server.videos:
+        for video in server.cached_videos:
             output += str(video.uid) + " "
         
         output += "\n"
@@ -22,5 +22,5 @@ def write_output(cache_servers, filepath):
 # Testing
 if __name__ == '__main__':
     server = Cache(3290, 100)
-    server.videos = [Video(2, 100), Video(4, 200)]
+    server.cached_videos = [Video(2, 100), Video(4, 200)]
     print(get_output_string([server]))

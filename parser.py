@@ -36,7 +36,6 @@ def parse(fileName):
 	for i in range(numberOfEndpoints):
 		endpointList.append(Endpoint(i, endpoints[i][1], endpoints[i][2], endpoints[i][0]))
 	
-	print(endpoints)
 	return (cacheList, endpointList)
 
 
