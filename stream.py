@@ -102,7 +102,6 @@ def test():
     # for cache, video_benefits in cache_benefits.items():
     #     video_benefits.sort(key=lambda video_benefit: video_benefit[0])
 
-    
 
-test()
-
+if __name__ == '__main__':
+	test()

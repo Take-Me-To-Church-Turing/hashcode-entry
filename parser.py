@@ -1,60 +1,54 @@
-class Endpoint:
-    def __init__(self, lines, startIndex):
-        curLine = lines[startIndex]
-        startIndex += 1
-        self.datacenterLatency = curLine[0]
-        self.numberOfCaches = curLine[1]
-        self.cacheLatencies = {}
-        for _ in range(self.numberOfCaches):
-            curLine = lines[startIndex]
-            startIndex += 1
-            cacheIndex = curLine[0]
-            cacheLatency = curLine[1]
-            self.cacheLatencies[cacheIndex] = cacheLatency
-        self.videoRequests = {}
+from stream import Cache
+from stream import Video
+from stream import Endpoint
 
-    def getDatacenterLatency(self):
-        return self.datacenterLatency
+def parse(fileName):
+	with open(fileName, 'r') as f:
+		lines = map(lambda line: map(int, line.split(" ")), f.readlines())
+	numberOfVideos = lines[0][0]
+	numberOfEndpoints = lines[0][1]
+	numberOfVideoRequests = lines[0][2]
+	numberOfCacheServers = lines[0][3]
+	cacheServerSize = lines[0][4]
+	videosSizes = lines[1]
 
-    def getNumberOfCaches(self):
-        return self.numberOfCaches
+	endpoints = []
+	startIndex = 2
+	for i in range(numberOfEndpoints):
+		endpoints.append(parseEndpoint(lines, startIndex))
+		startIndex += len(endpoints[i][1]) + 1
+	for _ in range(numberOfVideoRequests):
+		curLine = lines[startIndex]
+		startIndex += 1
+		endpoints[curLine[1]][2][curLine[0]] = Video(curLine[0], curLine[2])
 
-    def getCacheLatencies(self):
-        return self.cacheLatencies
+	cacheList = []
+	endpointList = []
+	for i in range(numberOfCacheServers):
+		cacheList.append(Cache(i, cacheSize))
 
-    def getVideoRequests(self):
-        return self.videoRequests
+	for i in range(numberOfEndpoints):
+		endpointList.append(Endpoint(i, endpoints[i][1], endpoints[i][2], endpoints[i][0]))
+	
 
-    def addVideoRequest(self, videoId, numberOfRequests):
-        self.videoRequests[videoId] = numberOfRequests
-
-
-
-with open('kittens.in', 'r') as f:
-    lines = map(lambda line: map(int, line.split(" ")), f.readlines())
+	return (cacheList, endpointList)
 
 
-numberOfVideos = lines[0][0]
-numberOfEndpoints = lines[0][1]
-numberOfVideoRequests = lines[0][2]
-numberOfCacheServers = lines[0][3]
-cacheServerSize = lines[0][4]
+def parseEndpoint(lines, startIndex):
+	returnValue = []
 
-videosSizes = lines[1]
+	curLine = lines[startIndex]
+	startIndex += 1
 
-endpoints = []
-startIndex = 2
-print(numberOfEndpoints)
-for i in range(numberOfEndpoints):
-    endpoints.append(Endpoint(lines, startIndex))
-    startIndex += endpoints[i].getNumberOfCaches() + 1
+	returnValue.append(curLine[0])
+	returnValue.append({})
 
-for _ in range(numberOfVideoRequests):
-    curLine = map(int, lines[startIndex])
-    startIndex += 1
-    endpoints[curLine[1]].addVideoRequest(curLine[0], curLine[2])
+	numberOfCaches = curLine[1]
+	for _ in range(numberOfCaches):
+		curLine = lines[startIndex]
+		startIndex += 1
+		returnValue[1][curLine[0]] = curLine[1]
+	returnValue.append({})
 
-# print(numberOfVideos, numberOfEndpoints, numberOfVideoRequests, numberOfCacheServers, cacheServerSize)
-# print(videosSizes)
-# for i in range(numberOfEndpoints):
-# 	print(endpoints[i].getDatacenterLatency(), endpoints[i].getCacheLatencies(), endpoints[i].getVideoRequests())
+	print(returnValue)
+	return returnValue
