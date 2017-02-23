@@ -28,7 +28,6 @@ class Endpoint:
 		for uid, cache_latency in self.cache_latencies.items():
 			self.delta_latencies[uid] = self.datacenter_latency - cache_latency
 
-
 class Video:
 	uid = 0
 	size = 0
