@@ -79,9 +79,10 @@ class Video:
         self.size = size
 
 def test():
-    caches = [Cache(0, 1000)]
-    videos = [Video(0, 500), Video(1, 200)]
-    endpoints = [Endpoint(0, {caches[0]: 100}, {videos[0]: 50, videos[1]: 100}, 500)]
+    caches = [Cache(0, 100), Cache(1, 100), Cache(2, 100)]
+    videos = [Video(0, 50), Video(1, 50), Video(2, 80), Video(3, 30), Video(4, 110)]
+    endpoints = [Endpoint(0, {caches[0]: 100, caches[1]: 200, caches[2]: 200}, {videos[1]:1000, videos[3]: 1500, videos[4]: 500}, 1000),
+    			 Endpoint(1, {}, {videos[0]: 1000}, 500)]
 
     # Combine endpoints
     for endpoint in endpoints:
@@ -90,6 +91,7 @@ def test():
             for video, benefit in video_benefits.items():
                 if video in cache.cached_video_benefit_dict:
                     current_benefit = cache.cached_video_benefit_dict[video]
+                    print(benefit)
                     current_benefit[0] += benefit
                     current_benefit[1].append(endpoint)
                 else:
