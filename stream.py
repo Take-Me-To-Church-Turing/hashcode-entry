@@ -1,15 +1,11 @@
 class Cache:
-    uid = 0
-    capacity = 0 # MB
-    used = 0 # MB
-
-    cached_videos = []
-    cached_video_priority_queue = [] # (video * (benefit * endpoints)) list
-    cached_video_benefit_dict = {} # video:[benefit, endpoints]
-
     def __init__(self, uid, capacity):
         self.uid = uid
         self.capacity = capacity
+        self.used = 0
+        self.cached_videos = []
+        self.cached_video_priority_queue = [] # (video * (benefit * endpoints)) list
+        self.cached_video_benefit_dict = {} # video:[benefit, endpoints]
 
     def populate_priority_queue(self):
         self.cached_video_priority_queue = []
@@ -17,31 +13,21 @@ class Cache:
         self.cached_video_priority_queue.sort(key=lambda i: i[1][0], reverse=True)
 
     def fill_cache(self):
-        # todo refactor
-        # sorted_queue has type (video * benefit) list
-
         for (video, (benefit, endpoints)) in self.cached_video_priority_queue:
             if (self.used + video.size > self.capacity):
                 continue
             self.cached_videos.append(video)
-        
-        print(self.cached_videos)
+            self.used += video.size
         
 
 class Endpoint:
-    uid = 0
-    delta_latencies = {} # cache, delta latency
-    video_requests = {} # video, num_requests
-    caches = []
-    datacenter_latency = 0
-
-    unsorted_cache_video_benefits = {} # (cache-(video-benefit dictionary) dictionary)
-
     def __init__(self, uid, cache_latencies, video_requests, datacenter_latency):
         self.uid = uid
         self.caches = cache_latencies.keys()
-        self.video_requests = video_requests
+        self.video_requests = video_requests # video, num_requests
         self.datacenter_latency = datacenter_latency
+        self.unsorted_cache_video_benefits = {} # (cache-(video-benefit dictionary) dictionary)
+        self.delta_latencies = {} # cache, delta latency
 
         self.compute_delta_latencies(cache_latencies)
 
@@ -71,9 +57,6 @@ class Endpoint:
         return num_requests * delta_latency / video_size
 
 class Video:
-    uid = 0
-    size = 0
-
     def __init__(self, uid, size):
         self.uid = uid
         self.size = size
@@ -94,8 +77,6 @@ def test():
             for video, benefit in video_benefits.items():
                 if video in cache.cached_video_benefit_dict:
                     current_benefit = cache.cached_video_benefit_dict[video]
-                    print(benefit)
-                    print(current_benefit)
                     current_benefit[0] += benefit
                     current_benefit[1].append(endpoint)
                 else:
